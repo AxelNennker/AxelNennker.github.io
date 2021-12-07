@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Anzahl der Geimpften und Ungeimpften im Krankenhaus je Impfquote</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        html {
+            border-radius: 20px;
+            border: solid gray;
+            margin: 10px;
+        }
+        .boxGeimpft {
+            background-color: #F2A93B;
+            width: 6px; height: 6px;
+            border-width: thin;
+            padding: 1px;
+            border-color: black;
+            border-style: solid;
+            margin: 1px;
+        }
+        .boxUngeimpft {
+            background-color: #698297;
+            width: 6px; height: 6px;
+            border-width: thin;
+            padding: 1px;
+            border-color: black;
+            border-style: solid;
+            margin: 1px;
+        }
+    </style>
+    <script>
+        let iql=75;
+        let iqr=90;
+        let persons = 1; // million persons
+        let wahrscheinlichkeitEinerInfektionProzent = 1.0;
+        let wahrscheinlichkeitEinerSymptomatischenInfektionProzent = 80;
+        let impfeffectivitaetGegenSymtomatischeInfektionenProzent = 75;
+        let wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent = 7;
+        let impfeffectivitaetGegenHospitalisierung = 90;
+
+        function update() {
+            let elt;
+
+            elt = document.getElementById("iql");
+            elt.innerText=""+iql;
+            elt = document.getElementById("iqr");
+            elt.innerText=""+iqr;
+
+            elt = document.getElementById("personsl");
+            elt.innerText=""+persons;
+            elt = document.getElementById("personsr");
+            elt.innerText=""+persons;
+
+            elt = document.getElementById("ungeimpfteL");
+            let ungeimpfteL = 1000000*persons - persons * 10000 * iql;
+            elt.innerText=""+ungeimpfteL;
+            elt = document.getElementById("geimpfteL");
+            let geimpfteL = persons * 10000 * iql;
+            elt.innerText=""+geimpfteL;
+
+            elt = document.getElementById("ungeimpfteR");
+            let ungeimpfteR = 1000000*persons - persons * 10000 * iqr
+            elt.innerText=""+ungeimpfteR;
+            elt = document.getElementById("geimpfteR");
+            let geimpfteR = persons * 10000 * iqr;
+            elt.innerText=""+geimpfteR;
+
+            let ungeimpfteSymptomatischeInfektionenL = Math.round(ungeimpfteL*wahrscheinlichkeitEinerInfektionProzent/100*wahrscheinlichkeitEinerSymptomatischenInfektionProzent/100);
+            elt = document.getElementById("ungeimpfteSymptomatischeInfektionenL");
+            elt.innerText=""+ungeimpfteSymptomatischeInfektionenL;
+            elt = document.getElementById("geimpfteSymptomatischeInfektionenL");
+            let geimpfteSymptomatischeInfektionenL =
+                Math.round(geimpfteL*wahrscheinlichkeitEinerInfektionProzent/100*wahrscheinlichkeitEinerSymptomatischenInfektionProzent/100*(100-impfeffectivitaetGegenSymtomatischeInfektionenProzent)/100);
+            elt.innerText=""+geimpfteSymptomatischeInfektionenL;
+
+            let ungeimpfteSymptomatischeInfektionenR = Math.round(ungeimpfteR*wahrscheinlichkeitEinerInfektionProzent/100*wahrscheinlichkeitEinerSymptomatischenInfektionProzent/100);
+            elt = document.getElementById("ungeimpfteSymptomatischeInfektionenR");
+            elt.innerText=""+ungeimpfteSymptomatischeInfektionenR;
+            let geimpfteSymptomatischeInfektionenR = Math.round(geimpfteR*wahrscheinlichkeitEinerInfektionProzent/100*wahrscheinlichkeitEinerSymptomatischenInfektionProzent/100*(100-impfeffectivitaetGegenSymtomatischeInfektionenProzent)/100);
+            elt = document.getElementById("geimpfteSymptomatischeInfektionenR");
+            elt.innerText=""+geimpfteSymptomatischeInfektionenR;
+
+            let ungeimpfteImKrankenhausL = Math.round(ungeimpfteSymptomatischeInfektionenL * wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent/100);
+            elt = document.getElementById("ungeimpfteImKrankenhausL");
+            elt.innerText=""+ungeimpfteImKrankenhausL;
+            let geimpfteImKrankenhausL = Math.round(geimpfteL * wahrscheinlichkeitEinerSymptomatischenInfektionProzent/100 * wahrscheinlichkeitEinerInfektionProzent/100 * wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent/100 *
+                (100-impfeffectivitaetGegenHospitalisierung)/100);
+            elt = document.getElementById("geimpfteImKrankenhausL");
+            elt.innerText=""+geimpfteImKrankenhausL;
+
+            let ungeimpfteImKrankenhausR = Math.round(ungeimpfteSymptomatischeInfektionenR * wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent/100);
+            elt = document.getElementById("ungeimpfteImKrankenhausR");
+            elt.innerText=""+ungeimpfteImKrankenhausR;
+            let geimpfteImKrankenhausR = Math.round(geimpfteR * wahrscheinlichkeitEinerSymptomatischenInfektionProzent/100 * wahrscheinlichkeitEinerInfektionProzent/100 * wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent/100 *
+                (100-impfeffectivitaetGegenHospitalisierung)/100);
+            elt = document.getElementById("geimpfteImKrankenhausR");
+            elt.innerText=""+geimpfteImKrankenhausR;
+
+            let absoluteAnzahlImKrankenhausL = ungeimpfteImKrankenhausL + geimpfteImKrankenhausL;
+            elt = document.getElementById("absoluteAnzahlImKrankenhausL");
+            elt.innerText=""+absoluteAnzahlImKrankenhausL;
+            let anteilGeimpfterImKrankenhausL = geimpfteImKrankenhausL / absoluteAnzahlImKrankenhausL;
+            elt = document.getElementById("anteilGeimpfterImKrankenhausL");
+            elt.innerText=""+Math.round(anteilGeimpfterImKrankenhausL*100);
+
+            let absoluteAnzahlImKrankenhausR = ungeimpfteImKrankenhausR + geimpfteImKrankenhausR;
+            elt = document.getElementById("absoluteAnzahlImKrankenhausR");
+            elt.innerText=""+absoluteAnzahlImKrankenhausR;
+            let anteilGeimpfterImKrankenhausR = geimpfteImKrankenhausR / absoluteAnzahlImKrankenhausR;
+            elt = document.getElementById("anteilGeimpfterImKrankenhausR");
+            elt.innerText=""+Math.round(anteilGeimpfterImKrankenhausR*100);
+
+            elt = document.getElementById("wahrscheinlichkeitEinerInfektionProzent");
+            elt.innerText=""+wahrscheinlichkeitEinerInfektionProzent;
+
+            elt = document.getElementById("wahrscheinlichkeitEinerSymptomatischenInfektionProzent");
+            elt.innerText=""+wahrscheinlichkeitEinerSymptomatischenInfektionProzent;
+
+            elt = document.getElementById("impfeffectivitaetGegenSymtomatischeInfektionenProzent");
+            elt.innerText=""+impfeffectivitaetGegenSymtomatischeInfektionenProzent;
+
+            elt = document.getElementById("wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent");
+            elt.innerText=""+wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent;
+
+            elt = document.getElementById("impfeffectivitaetGegenHospitalisierung");
+            elt.innerText=""+impfeffectivitaetGegenHospitalisierung;
+
+            let boxesLeft = document.getElementById("boxesLeft");
+            let i;
+            for (i=0; i<ungeimpfteImKrankenhausL; i++) {
+                let ungeimpftbox = document.createElement("span");
+                ungeimpftbox.setAttribute("class", "boxUngeimpft");
+                ungeimpftbox.innerText = " ";
+                boxesLeft.appendChild(ungeimpftbox);
+            }
+            for (i=0; i<geimpfteImKrankenhausL; i++) {
+                let geimpftbox = document.createElement("span");
+                geimpftbox.setAttribute("class", "boxGeimpft");
+                geimpftbox.innerText = " ";
+                boxesLeft.appendChild(geimpftbox);
+            }
+
+            let boxesRight = document.getElementById("boxesRight");
+            for (i=0; i<ungeimpfteImKrankenhausR; i++) {
+                let ungeimpftbox = document.createElement("span");
+                ungeimpftbox.setAttribute("class", "boxUngeimpft");
+                ungeimpftbox.innerText = " ";
+                boxesRight.appendChild(ungeimpftbox);
+            }
+            for (i=0; i<geimpfteImKrankenhausR; i++) {
+                let geimpftbox = document.createElement("span");
+                geimpftbox.setAttribute("class", "boxGeimpft");
+                geimpftbox.innerText = " ";
+                boxesRight.appendChild(geimpftbox);
+            }
+
+        }
+
+        function iqlPlus() { iql=iql+1; if (iql>=iqr) {iql=iqr-1;} update();}
+        function iqlMinus() { iql=iql-1; if (iql<=0) {iql=0;} update();}
+
+        function iqrPlus() { iqr=iqr+1; if (iqr>100) {iql=100;} update();}
+        function iqrMinus() { iqr=iqr-1; if (iqr<=iql) {iqr=iql+1;} update();}
+
+        function personsPlus() { persons=persons+1; update();}
+        function personsMinus() { persons=persons-1; if (persons<1) {persons=1;} update();}
+
+        function wahrscheinlichkeitEinerInfektionProzentPlus() {
+            wahrscheinlichkeitEinerInfektionProzent=Math.round((wahrscheinlichkeitEinerInfektionProzent + Number.EPSILON) * 10 + 1) / 10;
+            if (wahrscheinlichkeitEinerInfektionProzent>100.0) {
+                wahrscheinlichkeitEinerInfektionProzent = 100.0;
+            }
+            update();
+        }
+        function wahrscheinlichkeitEinerInfektionProzentMinus() {
+            wahrscheinlichkeitEinerInfektionProzent=Math.round((wahrscheinlichkeitEinerInfektionProzent + Number.EPSILON) * 10 - 1) / 10;
+            if (wahrscheinlichkeitEinerInfektionProzent<0.1) {
+                wahrscheinlichkeitEinerInfektionProzent = 0.1;
+            }
+            update();
+        }
+
+        function wahrscheinlichkeitEinerSymptomatischenInfektionProzentPlus() {
+            wahrscheinlichkeitEinerSymptomatischenInfektionProzent=wahrscheinlichkeitEinerSymptomatischenInfektionProzent + 1;
+            if (wahrscheinlichkeitEinerSymptomatischenInfektionProzent>100) {
+                wahrscheinlichkeitEinerSymptomatischenInfektionProzent = 100;
+            }
+            update();
+        }
+        function wahrscheinlichkeitEinerSymptomatischenInfektionProzentMinus() {
+            wahrscheinlichkeitEinerSymptomatischenInfektionProzent=wahrscheinlichkeitEinerSymptomatischenInfektionProzent - 1;
+            if (wahrscheinlichkeitEinerSymptomatischenInfektionProzent<1) {
+                wahrscheinlichkeitEinerSymptomatischenInfektionProzent = 1;
+            }
+            update();
+        }
+
+        function impfeffectivitaetGegenSymtomatischeInfektionenProzentPlus() {
+            impfeffectivitaetGegenSymtomatischeInfektionenProzent=impfeffectivitaetGegenSymtomatischeInfektionenProzent + 1;
+            if (impfeffectivitaetGegenSymtomatischeInfektionenProzent>100) {
+                impfeffectivitaetGegenSymtomatischeInfektionenProzent = 100;
+            }
+            update();
+        }
+        function impfeffectivitaetGegenSymtomatischeInfektionenProzentMinus() {
+            impfeffectivitaetGegenSymtomatischeInfektionenProzent=impfeffectivitaetGegenSymtomatischeInfektionenProzent - 1;
+            if (impfeffectivitaetGegenSymtomatischeInfektionenProzent<1) {
+                impfeffectivitaetGegenSymtomatischeInfektionenProzent = 1;
+            }
+            update();
+        }
+
+        function wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzentPlus() {
+            wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent=wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent + 1;
+            if (wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent>100) {
+                wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent = 100;
+            }
+            update();
+        }
+        function wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzentMinus() {
+            wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent=wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent - 1;
+            if (wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent<1) {
+                wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent = 1;
+            }
+            update();
+        }
+
+        function impfeffectivitaetGegenHospitalisierungPlus() {
+            impfeffectivitaetGegenHospitalisierung=impfeffectivitaetGegenHospitalisierung + 1;
+            if (impfeffectivitaetGegenHospitalisierung>100) {
+                impfeffectivitaetGegenHospitalisierung = 100;
+            }
+            update();
+        }
+        function impfeffectivitaetGegenHospitalisierungMinus() {
+            impfeffectivitaetGegenHospitalisierung=impfeffectivitaetGegenHospitalisierung - 1;
+            if (impfeffectivitaetGegenHospitalisierung<1) {
+                impfeffectivitaetGegenHospitalisierung = 1;
+            }
+            update();
+        }
+
+    </script>
+</head>
+<body>
+<!-- page content -->
+    <div style="font-size: xx-large; color: #3471B4; margin-bottom: 10px">
+        Ein hoher Anteil Geimpfter unter den COVID-19-Patientinnen und -Patienten
+        im Krankenhaus bedeutet nicht, dass die Impfung nicht wirkt.
+        Warum ist das so?
+    </div>
+    <div style="display: flex; flex-direction: row; justify-content: space-evenly; border-radius: 20px; background-color: #E7F1F7; border-right: 10px; padding: 10px">
+        <div style="display: flex; flex-direction: column; width: 50vh">
+            <div style="margin-right: 5vh"><span style="font-weight: bold">Bei einer niedrigen Impfquote ist die ab-
+                solute Anzahl von COVID-19-Patientinnen
+                und -Patienten im Krankenhaus hoch.</span>
+                <span>Der relative Anteil vollständig Geimpfter an
+                allen COVID-19-Patienten und Patientinnen
+                    ist niedrig.</span></div>
+            <div style="text-align: center; margin-top: 10px; font-size: x-large; color: #3471B4;">
+                <span>Impfquote </span><span id="iql"></span><span>%</span>
+                <button onclick="iqlPlus()">+</button>
+                <button onclick="iqlMinus()">-</button>
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-size: large; color: #3471B4;">
+                <span id="personsl"></span><span> Millionen Personen</span>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: center; margin-top: 10px">
+                <div style="display: flex; flex-direction: column; margin-right: 10px">
+                    <div id="ungeimpfteL" style="text-align: center; color: #698297;"></div>
+                    <div style="text-align: center; color: #698297;">Ungeimpfte</div>
+                    <div id="ungeimpfteSymptomatischeInfektionenL" style="text-align: center; margin-top: 10px; color: #698297;"></div>
+                    <div style="text-align: center;">
+                        <span style="color: #698297;">Symptomatische Infektionen</span>
+                        <span  style="vertical-align: super; font-size: smaller;"> [a,b]</span></div>
+                    <div id="ungeimpfteImKrankenhausL" style="text-align: center; margin-top: 10px; color: #698297;"></div>
+                    <div style="text-align: center;"><span style="color: #698297;">Im Krankenhaus</span><span style="vertical-align: super; font-size: smaller;"> [d]</span></div>
+                </div>
+                <div style="display: flex; flex-direction: column">
+                    <div id="geimpfteL" style="text-align: center; color: #F2A93B;"></div>
+                    <div style="text-align: center; color: #F2A93B;">Geimpfte</div>
+                    <div id="geimpfteSymptomatischeInfektionenL" style="text-align: center; margin-top: 10px; color: #F2A93B;"></div>
+                    <div style="text-align: center;"><span style="color: #F2A93B;">Symptomatische Infektionen</span><span style="vertical-align: super; font-size: smaller;"> [a,b,c]</span></div>
+                    <div id="geimpfteImKrankenhausL" style="text-align: center; margin-top: 10px; color: #F2A93B;"></div>
+                    <div style="text-align: center;"><span style="color: #F2A93B;">Im Krankenhaus</span><span style="vertical-align: super; font-size: smaller;"> [d,e]</span></div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: center; margin-top: 20px;">
+                <div style="display: flex; flex-direction: column; margin-right: 10px; width: 50%">
+                    <div style="text-align: center;">
+                        <span>Absolute Anzahl Geimpfter und Ungeimpfter im Krankenhaus: </span>
+                        <span id="absoluteAnzahlImKrankenhausL" style="font-weight: bold"></span>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px">
+                        <span>Anteil Geimpfter im Krankenhaus: &tilde;</span>
+                        <span id="anteilGeimpfterImKrankenhausL" style="font-weight: bold"></span>
+                        <span style="font-weight: bold">%</span>
+                    </div>
+                </div>
+                <div id="boxesLeft" style="display: flex; flex-flow: row wrap; width: 50%"></div>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; width: 50vh">
+            <div><span style="font-weight: bold">Bei einer hohen Impfquote ist die abso-
+                lute Anzahl von COVID-19-Patientinnen
+                und -Patienten im Krankenhaus niedrig.</span>
+                <span>Der relative Anteil vollständig Geimpfter an
+                allen COVID-19-Patienten und Patientinnen
+                    ist hoch.</span></div>
+            <div style="text-align: center; margin-top: 10px; font-size: x-large; color: #3471B4;">
+                <span>Impfquote </span><span id="iqr"></span><span>%</span>
+                <button onclick="iqrPlus()">+</button>
+                <button onclick="iqrMinus()">-</button>
+            </div>
+            <div style="text-align: center; margin-top: 10px; font-size: large; color: #3471B4;">
+                <span id="personsr"></span><span> Millionen Personen</span>
+                <button onclick="personsPlus()">+</button>
+                <button onclick="personsMinus()">-</button>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: center; margin-top: 10px">
+                <div style="display: flex; flex-direction: column; margin-right: 10px">
+                    <div id="ungeimpfteR" style="text-align: center; color: #698297;"></div>
+                    <div style="text-align: center; color: #698297;">Ungeimpfte</div>
+                    <div id="ungeimpfteSymptomatischeInfektionenR" style="text-align: center; margin-top: 10px; color: #698297;"></div>
+                    <div style="text-align: center;">
+                        <span style="color: #698297;">Symptomatische Infektionen</span>
+                        <span style="vertical-align: super; font-size: smaller;"> [a,b]</span></div>
+                    <div id="ungeimpfteImKrankenhausR" style="text-align: center; margin-top: 10px; color: #698297;"></div>
+                    <div style="text-align: center;">
+                        <span style="color: #698297;">Im Krankenhaus</span>
+                        <span style="vertical-align: super; font-size: smaller;"> [d]</span></div>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <div id="geimpfteR" style="text-align: center; color: #F2A93B;"></div>
+                    <div style="text-align: center; color: #F2A93B;">Geimpfte</div>
+                    <div id="geimpfteSymptomatischeInfektionenR" style="text-align: center; margin-top: 10px; color: #F2A93B;"></div>
+                    <div style="text-align: center">
+                        <span style="color: #F2A93B;">Symptomatische Infektionen</span>
+                        <span style="vertical-align: super; font-size: smaller;"> [a,b,c]</span></div>
+                    <div id="geimpfteImKrankenhausR" style="text-align: center; margin-top: 10px; color: #F2A93B;"></div>
+                    <div style="text-align: center;"><span style="color: #F2A93B;">Im Krankenhaus</span><span style="vertical-align: super; font-size: smaller;"> [d,e]</span></div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: flex-start; margin-top: 20px;">
+                <div id="boxesRight" style="display: flex; flex-flow: row wrap; width: 50%"></div>
+                <div style="display: flex; flex-direction: column; margin-right: 10px; width: 50%">
+                    <div style="text-align: center;">
+                        <span>Absolute Anzahl Geimpfter und Ungeimpfter im Krankenhaus: </span>
+                        <span id="absoluteAnzahlImKrankenhausR" style="font-weight: bold"></span>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px">
+                        <span>Anteil Geimpfter im Krankenhaus: &tilde;</span>
+                        <span id="anteilGeimpfterImKrankenhausR" style="font-weight: bold"></span>
+                        <span style="font-weight: bold">%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: row; justify-content: space-evenly; margin-top: 10px">
+        <div style="display: flex; flex-direction: column; flex: 1 1 0px">
+            <div style="font-size: large; color: #3170B3">Fazit</div>
+            <div style="background-color: #E7F1F7; border-radius: 10px; padding: 10px; margin-right: 10px">
+                <div>Eine Impfung ist der beste Schutz vor schweren Erkrankungen. Je mehr Personen geimpft sind, desto weniger Patientinnen und Patienten müssen insgesamt mit einer COVID-19-Infektion im Krankenhaus behandelt werden.
+                </div>
+                <div style="margin-top: 10px">
+                    Mehr Informationen zu den COVID-19-
+                    Impfungen auf:
+                    <a href="https://www.rki.de/covid-19-faq-impfen">www.rki.de/covid-19-faq-impfen</a>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; flex: 1 1 0px">
+            <div style="font-size: large; color: #3170B3">Annahmen und Quellen</div>
+            <div style="background-color: #E7F1F7; border-radius: 10px">
+                <ol style="list-style-type: lower-alpha">
+                    <li>
+                        <div>
+                            <span>Wahrscheinlichkeit einer Infektion: </span><span id="wahrscheinlichkeitEinerInfektionProzent">1.0</span><span>%</span>
+                            <button onclick="wahrscheinlichkeitEinerInfektionProzentPlus()">+</button>
+                            <button onclick="wahrscheinlichkeitEinerInfektionProzentMinus()">-</button>
+                        </div>
+                        <div>
+                            <a href="https://covidstrategycalculator.github.io/index.html">(siehe COVID Strategy Calculator)</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <span>Wahrscheinlichkeit, dass eine Infektion symptomatisch ist: </span><span id="wahrscheinlichkeitEinerSymptomatischenInfektionProzent"></span><span>%</span>
+                            <button onclick="wahrscheinlichkeitEinerSymptomatischenInfektionProzentPlus()">+</button>
+                            <button onclick="wahrscheinlichkeitEinerSymptomatischenInfektionProzentMinus()">-</button>
+                        </div>
+                        <div>
+                            <a href="https://covidstrategycalculator.github.io/index.html">(s. COVID Strategy Calculator)</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <span>Impfeffektivität gegen symptomatische Infektionen: </span><span id="impfeffectivitaetGegenSymtomatischeInfektionenProzent"></span><span>%</span>
+                            <button onclick="impfeffectivitaetGegenSymtomatischeInfektionenProzentPlus()">+</button>
+                            <button onclick="impfeffectivitaetGegenSymtomatischeInfektionenProzentMinus()">-</button>
+                        </div>
+                        <div>
+                            <a href="https://www.rki.de/SharedDocs/FAQ/COVID-Impfen/gesamt.html">(s. FAQs zum Impfen)</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <span>Wahrscheinlichkeit, bei einer symptomatischen Infektion ins Krankenhaus aufgenommen zu werden: </span><span id="wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzent"></span><span>%</span>
+                            <button onclick="wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzentPlus()">+</button>
+                            <button onclick="wahrscheinlichkeitEinerSymptomatischenInfektionMitKrankenhausaufenthaltProzentMinus()">-</button>
+                        </div>
+                        <div>
+                            <a href="https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Situationsberichte/Wochenbericht/Wochenberichte_Tab.html"> (s. Wochenbericht des RKI)</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <span>Impfeffektivität gegen Hospitalisierung: </span><span id="impfeffectivitaetGegenHospitalisierung"></span><span>%</span>
+                            <button onclick="impfeffectivitaetGegenHospitalisierungPlus()">+</button>
+                            <button onclick="impfeffectivitaetGegenHospitalisierungMinus()">-</button>
+                        </div>
+                        <div>
+                            <a href="https://www.rki.de/SharedDocs/FAQ/COVID-Impfen/gesamt.html">(s. FAQs zum Impfen)</a>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    <script>
+        update();
+    </script>
+</body>
+</html>
